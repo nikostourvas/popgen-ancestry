@@ -1,0 +1,47 @@
+# =============================================================================
+#  Example run on simulated data: ready to go, no editing needed.
+#  Takes a few minutes on a laptop.
+#    Windows:        .\run.bat --configfile example/config.yaml --cores 4
+#    Linux / macOS:  ./run.sh  --configfile example/config.yaml --cores 4
+#  Then open results/example/report.html. See example/README.md for what to
+#  look for.
+#
+#  This file sets only what differs from the defaults. config/config.yaml
+#  lists and explains every option; copy that file for your own data.
+# =============================================================================
+
+project: example                    # results go to results/example/
+
+input:
+  # 108 simulated samples, 6 populations, 10 microsatellite loci (GenAlEx).
+  # Population labels look like "North_Ala" = Region_Pop.
+  # example/data/simulated.xlsx holds the same data as an Excel file.
+  file: example/data/simulated.csv
+  strata: Region/Pop                # names of the two label levels
+  pop_level: Pop                    # level STRUCTURE treats as the population
+
+structure:
+  k_min: 1
+  k_max: 8                          # test beyond the true K (6)
+  replicates: 5                     # runs per K
+  burnin: 5000                      # far too short for real data: use
+  numreps: 10000                    # 100000 or more for publication
+
+plots:
+  group_labels: [Pop, Region]       # labels drawn under the bars
+  order_by: Region
+  single_k:
+    k: [2, 6]                       # one figure for K=2 and one for K=6
+    divide_by: Pop                  # divider lines between populations
+  k_range:
+    ranges: [[2, 8]]                # one figure stacking K=2 to K=8
+    divide_by: Pop
+
+maps:
+  enabled: true
+  k: [6]
+  coords: example/data/coords.csv   # fictional coordinates, one row per Pop
+  coords_columns: {pop: Pop, latitude: Latitude, longitude: Longitude}
+  regions:
+    - name: all                     # whole sampling area
+    - {name: north, xlim: [21.5, 25], ylim: [40, 42], labels: false}

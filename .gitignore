@@ -5,8 +5,5 @@ results/
 .snakemake/
 config/*.yaml
 !config/config.yaml
-# Test outputs
-.test/results/
-.test/.snakemake/
 *.Rhistory
 .Rproj.user/

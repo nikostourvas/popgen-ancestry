@@ -1,0 +1,8 @@
+# The same example, read from the Excel version of the data. Give it after
+# example/config.yaml, which supplies all other settings:
+#   .\run.bat --configfile example/config.yaml example/config_xlsx.yaml --cores 4
+#   ./run.sh  --configfile example/config.yaml example/config_xlsx.yaml --cores 4
+project: example_xlsx
+
+input:
+  file: example/data/simulated.xlsx

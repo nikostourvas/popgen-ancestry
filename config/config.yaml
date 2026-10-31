@@ -5,6 +5,7 @@
 #  2. Run (Windows):  run.bat --configfile config/my_project.yaml --cores 4
 #           (Linux):  ./run.sh --configfile config/my_project.yaml --cores 4
 #  Paths are relative to the pipeline folder (the folder with run.bat).
+#  A filled-in, ready-to-run example: example/config.yaml (see example/README.md).
 #  Lines starting with # are comments. Keep the indentation (spaces, no tabs).
 # =============================================================================
 

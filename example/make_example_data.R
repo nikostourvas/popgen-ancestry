@@ -1,11 +1,11 @@
-# Regenerates the simulated test data in .test/data/ (run from the repo root):
+# Regenerates the simulated example data in example/data/ (run from the repo root):
 #   docker run --rm -v "$PWD:/work" -w /work nikostourvas/forest_popgen:0.4.15 \
-#     Rscript .test/make_test_data.R
+#     Rscript example/make_example_data.R
 #
 # Genotypes are simulated with hierfstat::sim.genot() (island model), so the
-# test data are synthetic and carry no third-party licence.
+# example data are synthetic and carry no third-party licence.
 # The six populations exchange migrants equally (no regional hierarchy); the
-# North/South regions are labels only, for testing strata and group labels.
+# North/South regions are labels only, to show strata and group labels.
 
 suppressPackageStartupMessages({
   library(hierfstat)
@@ -38,7 +38,7 @@ to_sizes <- function(g) {
 geno <- as.data.frame(lapply(sim[-1], to_sizes))
 names(geno) <- sprintf("SSR%02d", seq_len(n_loci))
 
-# About 2% missing genotypes, to exercise missing-data handling
+# About 2% missing genotypes, as in real data
 miss <- matrix(runif(nrow(geno) * n_loci) < 0.02, nrow(geno))
 geno[miss] <- NA
 
@@ -49,15 +49,15 @@ obj <- df2genind(geno,
   pop = paste(p$Region, p$Pop, sep = "_")
 )
 
-dir.create(".test/data", showWarnings = FALSE)
-genind2genalex(obj, ".test/data/simulated.csv", overwrite = TRUE, sep = ",")
+dir.create("example/data", showWarnings = FALSE)
+genind2genalex(obj, "example/data/simulated.csv", overwrite = TRUE, sep = ",")
 
-# Same data as an Excel GenAlEx sheet, for testing the xlsx reader
-raw <- utils::read.csv(".test/data/simulated.csv", header = FALSE, colClasses = "character")
-writexl::write_xlsx(raw, ".test/data/simulated.xlsx", col_names = FALSE)
+# Same data as an Excel GenAlEx sheet, to show Excel input
+raw <- utils::read.csv("example/data/simulated.csv", header = FALSE, colClasses = "character")
+writexl::write_xlsx(raw, "example/data/simulated.xlsx", col_names = FALSE)
 
 # Fictional sampling coordinates, for the pie-chart maps
-utils::write.csv(pops[c("Pop", "Latitude", "Longitude")], ".test/data/coords.csv", row.names = FALSE)
+utils::write.csv(pops[c("Pop", "Latitude", "Longitude")], "example/data/coords.csv", row.names = FALSE)
 
 print(table(pop(obj)))
 cat(nInd(obj), "individuals,", nLoc(obj), "loci,", sum(miss), "missing genotypes\n")

@@ -35,14 +35,16 @@ plot_q_pophelper <- function(qlist, samples, common, opts, joined) {
   })
   ql <- pophelper::as.qlist(ql)
 
-  # Defaults reproduce the plotQ() calls of the FRUITDIV STRUCTURE notebook.
+  # Defaults follow the plotQ() calls of the FRUITDIV STRUCTURE notebook,
+  # except that group labels of the joined plot are centred in their row
+  # (FRUITDIV used grplabjust = 0.3, grplabpos = 0.1, which clips long labels).
   if (joined) {
     args <- list(
       imgoutput = "join", basesize = 20,
       splabsize = 11, splabangle = 90,
       showyaxis = FALSE, showticks = FALSE, ticksize = 0.3, ticklength = 0.2,
       grplabsize = 3.5, linesize = 0.8, pointsize = 4, grplabangle = 90,
-      grplabjust = 0.3, grplabpos = 0.1, divsize = 0.5,
+      grplabjust = 0.5, grplabpos = 0.5, divsize = 0.5,
       panelratio = c(3, 2)
     )
   } else {

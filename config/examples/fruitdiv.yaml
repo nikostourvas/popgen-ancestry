@@ -33,6 +33,7 @@ plots:
     divide_by: Country
     width: 10
     height: 10
+    extra_args: {grplabjust: 0.3, grplabpos: 0.1}   # label placement of the original figure
 
 maps:
   enabled: true

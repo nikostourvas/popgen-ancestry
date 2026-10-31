@@ -6,6 +6,8 @@ Support for ADMIXTURE is planned.
 
 **You only edit a configuration file.** Everything runs inside the `forest_popgen` Docker image, so the same pipeline works on a Windows laptop, a Linux workstation and an HPC cluster.
 
+**Try it first:** [`example/`](example/) has simulated data and a ready-to-run config. It takes a few minutes; see step 5 below.
+
 The pipeline only *runs* STRUCTURE and CLUMPAK and reads their output. Evanno's ΔK and the barplots come from [pophelper](https://github.com/royfrancis/pophelper). The workflow is managed by [Snakemake](https://snakemake.readthedocs.io).
 
 ---
@@ -20,18 +22,25 @@ The pipeline only *runs* STRUCTURE and CLUMPAK and reads their output. Evanno's 
    ```
    Older images (0.4.13 and earlier) cannot run STRUCTURE.
 3. **Get the pipeline:** `git clone https://github.com/nikostourvas/popgen-ancestry.git`, or on GitHub click *Code → Download ZIP* and extract it, e.g. to `C:\Users\<you>\popgen-ancestry`.
-4. **Add your data:** copy your GenAlEx file (`.csv` or `.xlsx`) into the `data\` folder.
-5. **Make your config:** copy `config\config.yaml` to e.g. `config\my_project.yaml` and edit the copy. Every option is explained in the file. Usually you change:
+4. **Open a terminal in the pipeline folder:** in Explorer, right-click the folder and choose *Open in Terminal*.
+5. **Run the example** (a few minutes) to check that everything works and to see the results:
+   ```
+   .\run.bat --configfile example/config.yaml --cores 4
+   ```
+   Then open `results\example\report.html`. [`example/README.md`](example/README.md) explains the data and what to look for.
+6. **Add your data:** copy your GenAlEx file (`.csv` or `.xlsx`) into the `data\` folder.
+7. **Make your config:** copy `config\config.yaml` to e.g. `config\my_project.yaml` and edit the copy. Every option is explained in the file. Usually you change:
    - `project`: a short name; results go to `results\<project>\`
    - `input.file`, `input.strata`, `input.pop_level`
    - `structure.k_max`, `replicates`, `burnin`, `numreps`
    - `plots.single_k.k` and `plots.k_range.ranges`
-6. **Open a terminal in the pipeline folder:** in Explorer, right-click the folder and choose *Open in Terminal*.
-7. **Check the plan (dry run).** This lists every step without running anything:
+
+   `example/config.yaml` shows a filled-in config.
+8. **Check the plan (dry run).** This lists every step without running anything:
    ```
    .\run.bat --configfile config/my_project.yaml -n
    ```
-8. **Run:**
+9. **Run:**
    ```
    .\run.bat --configfile config/my_project.yaml --cores 6
    ```
@@ -43,15 +52,11 @@ The pipeline only *runs* STRUCTURE and CLUMPAK and reads their output. Evanno's 
 
 Same steps, but use `./run.sh` instead of `.\run.bat`:
 ```
+./run.sh --configfile example/config.yaml --cores 4      # the example
 ./run.sh --configfile config/my_project.yaml -n          # dry run
 ./run.sh --configfile config/my_project.yaml --cores 8
 ```
 Set `CONTAINER_ENGINE=podman` to use podman instead of docker.
-
-To try the pipeline on the small simulated test dataset (about 1 minute; see `.test/make_test_data.R`):
-```
-./run.sh --configfile .test/config/config.yaml --cores 4
-```
 
 ## Good to know
 
@@ -122,6 +127,7 @@ Notes:
 - **New plotting engine** (e.g. ggplot2 with facets): add `plot_q_<engine>()` to `workflow/scripts/lib/plotting.R`, register it in `PLOT_ENGINES` and add the name to the `plots.engine` enum in the schema. Settings specific to pophelper can already be passed through `extra_args`.
 - **Re-runs:** the profiles set `rerun-triggers: [mtime, params, input]`, so changes to pipeline *code* do not trigger re-runs of finished steps. To redraw plots after changing plotting code, run with `--forcerun plot_single_k plot_k_range plot_map report`.
 - **Image version:** the container is pinned in the config schema default (`container`) and in `run.bat` / `run.sh`.
+- **Smoke test:** run the example, and once more with `--configfile example/config.yaml example/config_xlsx.yaml` to test the Excel reader. `example/make_example_data.R` regenerates the data.
 
 ## How to cite
 
@@ -137,4 +143,4 @@ Use **"Cite this repository"** on the GitHub page (from `CITATION.cff`). A Zenod
 
 ## License
 
-MIT (see `LICENSE`). STRUCTURE, CLUMPAK and the R packages used are not part of this repository; they are installed in the `forest_popgen` image and keep their own licences. The test data in `.test/data/` are simulated (`.test/make_test_data.R`).
+MIT (see `LICENSE`). STRUCTURE, CLUMPAK and the R packages used are not part of this repository; they are installed in the `forest_popgen` image and keep their own licences. The example data in `example/data/` are simulated (`example/make_example_data.R`).
