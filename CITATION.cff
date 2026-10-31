@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, together with the programs it runs (STRUCTURE, CLUMPAK, pophelper; see README)."
+type: software
+title: "popgen-ancestry: a config-driven pipeline for population ancestry analyses"
+abstract: >-
+  popgen-ancestry is a Snakemake pipeline that runs STRUCTURE for a range of K
+  with replicate runs, summarises the runs with CLUMPAK and produces Evanno
+  delta K, ancestry barplots, pie-chart maps and an HTML report. Users only
+  edit a YAML configuration file. All software runs inside the forest_popgen
+  container, so the same pipeline works on Windows and Linux laptops (Docker)
+  and on HPC clusters (Apptainer/SLURM). Support for ADMIXTURE is planned.
+authors:
+  - given-names: Nikolaos
+    family-names: Tourvas
+    affiliation: Aristotle University of Thessaloniki
+    orcid: "https://orcid.org/0000-0002-0476-4468"
+repository-code: "https://github.com/nikostourvas/popgen-ancestry"
+license: MIT
+keywords:
+  - population genetics
+  - population structure
+  - ancestry
+  - admixture
+  - STRUCTURE
+  - CLUMPAK
+  - Snakemake
+  - microsatellites

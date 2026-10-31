@@ -123,6 +123,10 @@ Notes:
 - **Re-runs:** the profiles set `rerun-triggers: [mtime, params, input]`, so changes to pipeline *code* do not trigger re-runs of finished steps. To redraw plots after changing plotting code, run with `--forcerun plot_single_k plot_k_range plot_map report`.
 - **Image version:** the container is pinned in the config schema default (`container`) and in `run.bat` / `run.sh`.
 
+## How to cite
+
+Use **"Cite this repository"** on the GitHub page (from `CITATION.cff`). A Zenodo DOI will be added with the first release. Please also cite the programs the pipeline runs, listed below.
+
 ## Citations
 
 - Pritchard, Stephens & Donnelly (2000) *Genetics* 155:945; Falush, Stephens & Pritchard (2003) *Genetics* 164:1567 (STRUCTURE)
