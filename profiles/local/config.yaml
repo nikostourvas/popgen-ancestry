@@ -1,0 +1,9 @@
+# Profile for laptops / workstations (inside Docker) and single servers.
+cores: all              # override with --cores N
+printshellcmds: true
+rerun-incomplete: true  # resume cleanly after an interruption
+keep-going: true        # one failed run does not stop the others
+show-failed-logs: true
+# Only re-run steps when inputs or settings change, not when the pipeline code
+# or the container version changes (avoids re-running days of STRUCTURE).
+rerun-triggers: [mtime, params, input]

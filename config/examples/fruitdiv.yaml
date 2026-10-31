@@ -1,0 +1,47 @@
+# FRUITDIV 3rd round (Oct 2025): the run of analysis/02_Structure_fruitdiv.Rmd
+# in the FRUITDIV repository, expressed as a pipeline config.
+# Copy the GenAlEx file into data/ first.
+
+project: fruitdiv_round3
+
+input:
+  file: data/2025-10-23_Fruitdiv_3rd_round_tandem_genalex_dedup_miss0_2_clonecorrected_wo_OUTgroup.csv
+  strata: GenePool/Pop/Country
+  pop_level: Pop
+
+structure:
+  k_min: 1
+  k_max: 10
+  replicates: 20
+  burnin: 500000
+  numreps: 500000
+  seed: 6030000
+
+plots:
+  palette: wong
+  group_labels: [Pop, Country, GenePool]
+  order_by: GenePool
+  formats: [pdf, png]
+  single_k:
+    k: [3, 8]
+    divide_by: Pop
+    sort_individuals: all
+    width: 10
+    height: 5
+  k_range:
+    ranges: [[2, 8]]
+    divide_by: Country
+    width: 10
+    height: 10
+
+maps:
+  enabled: true
+  k: [6]
+  coords: data/Field_Sites_Europe.csv
+  coords_columns: {pop: pop, latitude: Latitude, longitude: Longitude}
+  pie_radius: 0.5
+  regions:
+    - {name: balkans, xlim: [9, 30], ylim: [40, 48], width: 7, height: 3}
+    - {name: france, xlim: [-2, 5], ylim: [40, 48], labels: false, width: 2.8, height: 3}
+    - {name: caucasus, xlim: [39, 46], ylim: [40, 48], labels: false, width: 2.8, height: 3}
+    - {name: europe, xlim: [-2, 45], ylim: [40, 48], labels: false, width: 10, height: 3}

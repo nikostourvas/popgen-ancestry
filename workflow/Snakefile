@@ -1,0 +1,41 @@
+# popgen-ancestry: STRUCTURE + CLUMPAK pipeline
+#
+# Users only edit a config file (see config/config.yaml) and run:
+#   snakemake --profile profiles/local --configfile config/<project>.yaml
+# See README.md for Windows (Docker), Linux and HPC (SLURM + Apptainer) instructions.
+
+import os
+import re
+
+from snakemake.utils import min_version, validate
+from snakemake.exceptions import WorkflowError
+
+min_version("8.0")
+
+
+if not config:
+    raise WorkflowError(
+        "No configuration given. Run with --configfile config/<your_project>.yaml "
+        "(copy config/config.yaml as a starting point)."
+    )
+
+validate(config, "schemas/config.schema.yaml")
+
+
+# Container used for every job when running with --sdm apptainer (HPC).
+# Inside Docker (laptops) Snakemake already runs in this image and ignores it.
+container: config["container"]
+
+
+include: "rules/common.smk"
+include: "rules/input.smk"
+include: "rules/structure.smk"
+include: "rules/clumpak.smk"
+include: "rules/plots.smk"
+include: "rules/report.smk"
+
+
+rule all:
+    input:
+        all_targets(),
+    default_target: True

@@ -1,0 +1,120 @@
+# =============================================================================
+#  popgen-ancestry (STRUCTURE + CLUMPAK): project configuration
+# =============================================================================
+#  1. Copy this file, e.g. to config/my_project.yaml, and edit the copy.
+#  2. Run (Windows):  run.bat --configfile config/my_project.yaml --cores 4
+#           (Linux):  ./run.sh --configfile config/my_project.yaml --cores 4
+#  Paths are relative to the pipeline folder (the folder with run.bat).
+#  Lines starting with # are comments. Keep the indentation (spaces, no tabs).
+# =============================================================================
+
+# Name of this analysis. Results go to results/<project>/.
+# Letters, numbers, - _ . only. Use a new name for a new analysis.
+project: my_project
+
+# -----------------------------------------------------------------------------
+# Input data
+# -----------------------------------------------------------------------------
+input:
+  # GenAlEx file (.csv saved from Excel, or the .xlsx itself), diploid
+  # codominant markers (e.g. microsatellites). Put it in the data/ folder.
+  file: data/my_genotypes.csv
+  format: auto          # auto (from extension) | genalex_csv | genalex_xlsx
+  sheet: 1              # .xlsx only: sheet number or name
+  sep: auto             # .csv only: auto | "," | ";"
+
+  # Population labels in GenAlEx can hold several levels joined by "_",
+  # e.g. "Wild_arm_ARM" = GenePool_Pop_Country. Name the levels here
+  # (separated by /). Leave empty (null) if labels are simple population names;
+  # the level is then called Pop.
+  strata: null          # e.g. GenePool/Pop/Country
+  strata_sep: "_"
+  # Level used as the STRUCTURE population (POPDATA, LOCPRIOR, CLUMPAK labels)
+  pop_level: Pop
+
+  # Optional filters (use the names of the pop_level above / sample names)
+  keep_pops: []         # e.g. [arm, caz]  (empty = keep all)
+  exclude_pops: []      # e.g. [OUT]
+  exclude_samples: []   # e.g. [arm_41, caz_02]
+
+# -----------------------------------------------------------------------------
+# STRUCTURE
+# -----------------------------------------------------------------------------
+structure:
+  k_min: 1
+  k_max: 10
+  replicates: 10        # runs per K (CLUMPAK needs >= 2; 10-20 is typical)
+  burnin: 100000        # tip: test first with 10000/10000, then use real values
+  numreps: 100000       # MCMC repetitions after burn-in
+  seed: 1234            # run seed = seed + 1000*K + replicate (reproducible)
+  model:
+    admixture: true     # false = no-admixture model
+    freqscorr: true     # correlated allele frequencies
+    inferalpha: true
+    alpha: 1.0
+    inferlambda: false
+    lambda: 1.0
+    locprior: false     # true = use pop_level as sampling location prior
+  # Advanced: any other STRUCTURE setting, e.g. {ONEFST: 1} or {POPALPHAS: 1}
+  mainparams_extra: {}
+  extraparams_extra: {}
+
+# -----------------------------------------------------------------------------
+# CLUMPAK (leave the defaults unless you know you need something else)
+# -----------------------------------------------------------------------------
+clumpak:
+  clumpp_search_method: 3   # 1 FullSearch, 2 Greedy, 3 LargeKGreedy
+  clumpp_repeats: null      # Greedy/LargeKGreedy repeats (null = CLUMPAK default 2000)
+  mcl_threshold: null       # null = CLUMPAK default
+  mcl_min_cluster_fraction: null
+  extra_args: ""
+
+# -----------------------------------------------------------------------------
+# Barplots (CLUMPAK major mode of each K). Changing only this section and
+# re-running redraws the plots without re-running STRUCTURE or CLUMPAK.
+# -----------------------------------------------------------------------------
+plots:
+  engine: pophelper     # plotting library (only pophelper for now)
+  palette: wong         # wong, cb_paired, cb_set3, krzywinski, kr12, xlstat,
+                        # cb_paired_wgrs, shiny, or a list: ["#000000", "#E69F00"]
+  # Group labels drawn under the bars: any strata level(s) from input.strata
+  group_labels: [Pop]   # e.g. [Pop, Country, GenePool]; [] = none
+  order_by: null        # level used to order individuals (default: first label)
+  group_order: []       # optional order of the order_by groups, e.g. [Wild, Cultivated]
+  show_sample_names: false
+  formats: [pdf, png]   # pdf, png, svg, tiff
+  dpi: 300
+
+  # One figure per K listed here
+  single_k:
+    k: [2, 3]
+    divide_by: null     # level at which to draw divider lines, e.g. Pop
+    sort_individuals: all   # all | none | label | Cluster1 ...
+    width: null         # inches (null = 10)
+    height: null        # inches (null = 5)
+    extra_args: {}      # any other pophelper::plotQ() argument
+
+  # One figure stacking several K; list as many [from, to] ranges as you like
+  k_range:
+    ranges: [[2, 5]]    # e.g. [[2, 8], [2, 4]]
+    divide_by: null
+    sort_individuals: none
+    width: null         # null = 10
+    height: null        # null = 3 + number of K
+    extra_args: {}
+
+# -----------------------------------------------------------------------------
+# Optional pie-chart maps (mean ancestry per population)
+# -----------------------------------------------------------------------------
+maps:
+  enabled: false
+  k: [3]
+  coords: data/coordinates.csv     # one row per population
+  coords_columns: {pop: pop, latitude: Latitude, longitude: Longitude}
+  pop_column: null                 # level matching coords "pop" (null = pop_level)
+  pie_radius: 0.5
+  regions:                         # one map per region; xlim/ylim in degrees
+    - name: all                    # (omit xlim/ylim to fit all populations)
+
+# HTML summary with settings, Evanno, CLUMPAK modes and all plots
+report: true

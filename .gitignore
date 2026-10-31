@@ -1,0 +1,12 @@
+# User data and results stay local
+data/*
+!data/README.md
+results/
+.snakemake/
+config/*.yaml
+!config/config.yaml
+# Test outputs
+.test/results/
+.test/.snakemake/
+*.Rhistory
+.Rproj.user/

@@ -1,0 +1,139 @@
+---
+title: "STRUCTURE + CLUMPAK report: `r params$config$project`"
+date: "`r format(Sys.time(), '%Y-%m-%d %H:%M')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    self_contained: true
+params:
+  config: NULL
+  summary: NULL
+  samples: NULL
+  mainparams: NULL
+  extraparams: NULL
+  evanno: NULL
+  lnprob: NULL
+  evanno_plots: NULL
+  modes: NULL
+  plots: NULL
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+cfg <- params$config
+s <- yaml::read_yaml(params$summary)
+st <- cfg$structure
+png_of <- function(files) grep("\\.png$", files, value = TRUE)
+show_images <- function(files) {
+  pngs <- png_of(files)
+  if (length(pngs) == 0) {
+    cat("Add `png` to `plots.formats` to see the figures here. Files:\n\n")
+    cat(paste0("- `", files, "`"), sep = "\n")
+  } else {
+    for (f in pngs) cat(sprintf("![%s](%s)\n\n", basename(f), f))
+  }
+}
+```
+
+## Data
+
+- Input file: `r s$input_file` (`r s$input_format`)
+- **`r s$n_individuals` individuals**, **`r s$n_loci` loci**, `r s$n_populations` populations (level: `r s$pop_level`)
+- Strata: `r paste(s$strata, collapse = " / ")`
+- Missing data: `r s$missing_data_percent`% of allele calls
+
+```{r pop-table}
+pops <- data.frame(
+  population = names(s$individuals_per_population),
+  individuals = unlist(s$individuals_per_population),
+  row.names = NULL
+)
+knitr::kable(pops)
+```
+
+## STRUCTURE settings
+
+- K = `r st$k_min` to `r st$k_max`, `r st$replicates` replicates per K (`r (st$k_max - st$k_min + 1) * st$replicates` runs)
+- Burn-in `r format(st$burnin, big.mark = ",")`, MCMC repetitions after burn-in `r format(st$numreps, big.mark = ",")`
+- Model: `r if (isTRUE(st$model$admixture)) "admixture" else "no admixture"`,
+  `r if (isTRUE(st$model$freqscorr)) "correlated" else "independent"` allele frequencies,
+  LOCPRIOR `r if (isTRUE(st$model$locprior)) "on" else "off"`
+- Seeds: run seed = `r st$seed` + 1000 × K + replicate
+
+<details><summary>mainparams / extraparams</summary>
+
+```{r params-files, comment = ""}
+cat(readLines(params$mainparams), sep = "\n")
+cat("\n")
+cat(readLines(params$extraparams), sep = "\n")
+```
+
+</details>
+
+## Choosing K
+
+```{r lnprob}
+lnp <- utils::read.delim(params$lnprob)
+knitr::kable(lnp, digits = 2)
+```
+
+```{r evanno-table}
+ev <- utils::read.delim(params$evanno)
+knitr::kable(ev, digits = 3)
+```
+
+```{r evanno-plot, results = "asis"}
+show_images(params$evanno_plots)
+```
+
+## CLUMPAK modes
+
+For each K, CLUMPAK groups the replicate runs into modes. The plots show the
+**major mode**. Many minor modes, or a major mode with few runs, suggest that the
+runs disagree: check them, or use longer runs.
+
+```{r modes}
+knitr::kable(utils::read.delim(params$modes), digits = 3)
+```
+
+## Plots
+
+```{r plots, results = "asis"}
+plots <- params$plots
+groups <- list(
+  "Single K" = grep("/plots/single/", plots, value = TRUE),
+  "Range of K" = grep("/plots/range/", plots, value = TRUE),
+  "Maps" = grep("/plots/maps/", plots, value = TRUE)
+)
+for (nm in names(groups)) {
+  files <- groups[[nm]]
+  if (length(files) == 0) next
+  cat("\n\n### ", nm, "\n\n", sep = "")
+  show_images(files)
+}
+```
+
+All result files are in `results/`r cfg$project`/`:
+`q/` (Q tables, also as Excel), `plots/`, `evanno/`, `clumpak/` (full CLUMPAK output), `structure/runs/` (raw STRUCTURE output).
+
+## Software and citations
+
+```{r versions}
+pkgs <- c("adegenet", "poppr", "hierfstat", "pophelper", "ggplot2", "scatterpie")
+v <- vapply(pkgs, function(p) as.character(utils::packageVersion(p)), "")
+knitr::kable(data.frame(software = c("R", "STRUCTURE", "CLUMPAK", pkgs),
+                        version = c(R.version$version.string, "2.3.4", "26_03_2015", v)))
+```
+
+Please cite: Pritchard et al. (2000) and Falush et al. (2003) for STRUCTURE;
+Kopelman et al. (2015) for CLUMPAK; Evanno et al. (2005) for ΔK;
+Francis (2017) for pophelper; Mölder et al. (2021) for Snakemake.
+
+<details><summary>Full configuration</summary>
+
+```{r config, comment = ""}
+cat(yaml::as.yaml(cfg))
+```
+
+</details>

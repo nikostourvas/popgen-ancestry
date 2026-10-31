@@ -1,0 +1,36 @@
+# Quick smoke test on simulated data (about a minute on a laptop):
+#   ./run.sh --configfile .test/config/config.yaml --cores 4      (Linux/macOS)
+#   .\run.bat --configfile .test/config/config.yaml --cores 4     (Windows)
+# The data are simulated with hierfstat::sim.genot (see .test/make_test_data.R).
+project: test_simulated
+
+input:
+  file: .test/data/simulated.csv
+  strata: Region/Pop
+  pop_level: Pop
+
+structure:
+  k_min: 1
+  k_max: 6
+  replicates: 3
+  burnin: 2000
+  numreps: 2000
+
+plots:
+  group_labels: [Pop, Region]
+  order_by: Region
+  single_k:
+    k: [2, 6]
+    divide_by: Pop
+  k_range:
+    ranges: [[2, 6]]
+    divide_by: Pop
+
+maps:
+  enabled: true
+  k: [6]
+  coords: .test/data/coords.csv
+  coords_columns: {pop: Pop, latitude: Latitude, longitude: Longitude}
+  regions:
+    - name: all
+    - {name: north, xlim: [21.5, 25], ylim: [40, 42], labels: false}

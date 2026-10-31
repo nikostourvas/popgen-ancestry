@@ -1,0 +1,26 @@
+# Profile for SLURM clusters. Requires on the cluster (outside the container):
+#   snakemake >= 8, snakemake-executor-plugin-slurm, apptainer/singularity
+# Run from the pipeline folder:
+#   snakemake --profile profiles/slurm --configfile config/my_project.yaml
+executor: slurm
+jobs: 200                 # max. jobs queued at once
+software-deployment-method: apptainer
+# Bind extra folders if input data live outside the pipeline folder:
+# apptainer-args: "--bind /mnt/data"
+default-resources:
+  slurm_partition: "batch"     # EDIT: your partition
+  # slurm_account: "myaccount" # EDIT if your cluster needs an account
+  runtime: 60                  # minutes
+  mem_mb: 2000
+set-resources:
+  structure:
+    runtime: 1440        # minutes per STRUCTURE run; increase for long chains
+    mem_mb: 1000
+  clumpak:
+    runtime: 720   # one job for all K
+    mem_mb: 4000
+latency-wait: 60
+printshellcmds: true
+rerun-incomplete: true
+keep-going: true
+rerun-triggers: [mtime, params, input]

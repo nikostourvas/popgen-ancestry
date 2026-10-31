@@ -1,0 +1,165 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+description: Configuration of popgen-ancestry (STRUCTURE + CLUMPAK) (see config/config.yaml for explanations)
+type: object
+additionalProperties: false
+required: [project, input]
+
+properties:
+  project:
+    type: string
+    description: Name of the analysis; results go to results/<project>/
+
+  container:
+    type: string
+    default: "docker://nikostourvas/forest_popgen:0.4.15"
+
+  input:
+    type: object
+    additionalProperties: false
+    required: [file]
+    properties:
+      file: {type: string}
+      format:
+        type: string
+        enum: [auto, genalex_csv, genalex_xlsx]
+        default: auto
+      sep:
+        type: string
+        enum: [auto, ",", ";", "\t"]
+        default: auto
+      sheet:
+        type: [integer, string]
+        default: 1
+      strata: {type: ["string", "null"], default: null}
+      strata_sep: {type: string, default: "_"}
+      pop_level: {type: string, default: Pop}
+      keep_pops: {type: array, items: {type: string}, default: []}
+      exclude_pops: {type: array, items: {type: string}, default: []}
+      exclude_samples: {type: array, items: {type: string}, default: []}
+
+  structure:
+    type: object
+    additionalProperties: false
+    default: {}
+    properties:
+      k_min: {type: integer, minimum: 1, default: 1}
+      k_max: {type: integer, minimum: 1, default: 10}
+      replicates: {type: integer, minimum: 2, default: 10}
+      burnin: {type: integer, minimum: 1, default: 100000}
+      numreps: {type: integer, minimum: 1, default: 100000}
+      seed: {type: integer, minimum: 0, default: 1234}
+      model:
+        type: object
+        additionalProperties: false
+        default: {}
+        properties:
+          admixture: {type: boolean, default: true}
+          freqscorr: {type: boolean, default: true}
+          inferalpha: {type: boolean, default: true}
+          alpha: {type: number, default: 1.0}
+          inferlambda: {type: boolean, default: false}
+          lambda: {type: number, default: 1.0}
+          locprior: {type: boolean, default: false}
+      mainparams_extra: {type: object, default: {}}
+      extraparams_extra: {type: object, default: {}}
+
+  clumpak:
+    type: object
+    additionalProperties: false
+    default: {}
+    properties:
+      path:
+        type: string
+        default: /home/rstudio/software/clumpak/CLUMPAK/26_03_2015_CLUMPAK/CLUMPAK
+      clumpp_search_method: {type: integer, enum: [1, 2, 3], default: 3}
+      clumpp_repeats: {type: ["integer", "null"], default: null}
+      mcl_threshold: {type: ["number", "null"], default: null}
+      mcl_min_cluster_fraction: {type: ["number", "null"], default: null}
+      extra_args: {type: string, default: ""}
+
+  plots:
+    type: object
+    additionalProperties: false
+    default: {}
+    properties:
+      engine: {type: string, enum: [pophelper], default: pophelper}
+      palette:
+        oneOf:
+          - {type: string}
+          - {type: array, items: {type: string}}
+        default: wong
+      group_labels: {type: array, items: {type: string}, default: []}
+      order_by: {type: ["string", "null"], default: null}
+      group_order: {type: array, items: {type: string}, default: []}
+      show_sample_names: {type: boolean, default: false}
+      formats:
+        type: array
+        items: {type: string, enum: [pdf, png, svg, tiff]}
+        minItems: 1
+        default: [pdf, png]
+      dpi: {type: integer, default: 300}
+      single_k:
+        type: object
+        additionalProperties: false
+        default: {}
+        properties:
+          k: {type: array, items: {type: integer}, default: []}
+          divide_by: {type: ["string", "null"], default: null}
+          sort_individuals: {type: string, default: all}
+          width: {type: ["number", "null"], default: null}
+          height: {type: ["number", "null"], default: null}
+          extra_args: {type: object, default: {}}
+      k_range:
+        type: object
+        additionalProperties: false
+        default: {}
+        properties:
+          ranges:
+            type: array
+            items:
+              type: array
+              items: {type: integer}
+              minItems: 2
+              maxItems: 2
+            default: []
+          divide_by: {type: ["string", "null"], default: null}
+          sort_individuals: {type: string, default: none}
+          width: {type: ["number", "null"], default: null}
+          height: {type: ["number", "null"], default: null}
+          extra_args: {type: object, default: {}}
+
+  maps:
+    type: object
+    additionalProperties: false
+    default: {}
+    properties:
+      enabled: {type: boolean, default: false}
+      k: {type: array, items: {type: integer}, default: []}
+      coords: {type: string, default: ""}
+      coords_columns:
+        type: object
+        additionalProperties: false
+        default: {}
+        properties:
+          pop: {type: string, default: pop}
+          latitude: {type: string, default: Latitude}
+          longitude: {type: string, default: Longitude}
+      pop_column: {type: ["string", "null"], default: null}
+      pie_radius: {type: number, default: 0.5}
+      regions:
+        type: array
+        default: [{name: all}]
+        items:
+          type: object
+          additionalProperties: false
+          required: [name]
+          properties:
+            name: {type: string, pattern: "^[A-Za-z0-9-]+$"}
+            xlim: {type: array, items: {type: number}, minItems: 2, maxItems: 2}
+            ylim: {type: array, items: {type: number}, minItems: 2, maxItems: 2}
+            labels: {type: boolean}
+            title: {type: boolean}
+            width: {type: number}
+            height: {type: number}
+
+  report: {type: boolean, default: true}
